@@ -1,20 +1,32 @@
 module Commandline
+    open System
+
     type CommandLineOptions = {
-        field: int
+        fields: int list
         delimiter: string
         filename: string
     }
+
+    let getFields (fieldString: string) =
+        let fields =
+            if fieldString.Contains(',') then
+                fieldString.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            else
+                fieldString.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        fields
+        |> Array.toList
+        |> List.map int
 
     let rec parseCmdLineRec args options =
         match args with
             | [ x ] -> { options with filename = x }
             | e :: xs when e.StartsWith("-f") ->
                 if String.length e > 2 then
-                    parseCmdLineRec xs { options with field = e.Substring(2) |> int }
+                    parseCmdLineRec xs { options with fields = e.Substring(2) |> getFields }
                 else
                     match xs with
                         | num :: xss ->
-                            parseCmdLineRec xss { options with field = num |> int }
+                            parseCmdLineRec xss { options with fields = num |> getFields }
                         | _ ->
                             failwith "missing num"
             | e :: xs when e.StartsWith("-d") ->                        
@@ -31,7 +43,7 @@ module Commandline
 
     let parseCmdLine args =
         let defaultOptions = {
-            field = 1
+            fields = [1]
             delimiter = "\t"
             filename = ""
         }
