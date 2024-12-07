@@ -1,18 +1,26 @@
-﻿let get_content file =
+﻿open Commandline
+
+let getContent file =
     System.IO.File.ReadLines(file)
 
-let get_field (line:string) =
+let getField nField (line:string) =
     let fields = line.Split '\t'
-    if Array.length fields > 2 then
-        fields.[1]
+    if Array.length fields > nField then
+        fields.[nField]
     else
         ""
 
+let printFields options =
+    options.filename
+    |> getContent
+    |> Seq.map (getField options.field)
+    |> Seq.iter (printfn "%s")
+
 [<EntryPoint>]
 let main(args) =    
-    printfn "args: %A" args
-    Array.last args
-    |> get_content
-    |> Seq.map get_field
-    |> Seq.iter (printfn "%s")
+    let options = parseCmdLine args
+    printfn "%A" options
+    match options.filename with
+        | "" -> failwith "missing file"
+        | _ -> printFields options
     0

@@ -13,5 +13,6 @@ Program your own `cut` https://codingchallenges.fyi/challenges/challenge-cut/
 `jj bookmark set main`
 - push new bookmark  
 `jj git push --allow-new`
-
+- show all commits  
+`jj log -r 'all()'`
 
