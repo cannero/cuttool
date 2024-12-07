@@ -3,17 +3,17 @@
 let getContent file =
     System.IO.File.ReadLines(file)
 
-let getField nField (line:string) =
-    let fields = line.Split '\t'
-    if Array.length fields > nField then
-        fields.[nField]
+let getField options (line:string) =
+    let fields = line.Split options.delimiter
+    if Array.length fields > options.field-1 then
+        fields.[options.field-1]
     else
         ""
 
 let printFields options =
     options.filename
     |> getContent
-    |> Seq.map (getField options.field)
+    |> Seq.map (getField options)
     |> Seq.iter (printfn "%s")
 
 [<EntryPoint>]
