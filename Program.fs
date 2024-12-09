@@ -3,6 +3,11 @@
 let getContent file =
     System.IO.File.ReadLines(file)
 
+let getContentStdin () =
+    fun _ -> stdin.ReadLine()
+    |> Seq.initInfinite
+    |> Seq.takeWhile ((<>) null)
+
 let getField fields field =
     if Array.length fields > field-1 then
         fields.[field-1]
@@ -15,9 +20,8 @@ let getFields options (line:string) =
     options.fields |> List.map (getField fields)
 
 
-let printFields options =
-    options.filename
-    |> getContent
+let printFields options getFunc =
+    getFunc
     |> Seq.map (getFields options)
     |> Seq.iter (printfn "%A")
 
@@ -26,6 +30,6 @@ let main(args) =
     let options = parseCmdLine args
     printfn "%A" options
     match options.filename with
-        | "" -> failwith "missing file"
-        | _ -> printFields options
+        | "" -> printFields options (getContentStdin ())
+        | _ -> printFields options (options.filename |> getContent)
     0
